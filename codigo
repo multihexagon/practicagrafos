@@ -1,20 +1,36 @@
 import requests
 import spacy
 from bs4 import BeautifulSoup
-
-website = "https://en.wikipedia.org/wiki/Barack_Obama"
-result = requests.get(website)
-contenido = result.text
-npl = spacy.load("en_core_web_sm")
-
-soup = BeautifulSoup(contenido,"lxml")
-links = soup.find_all("a")
-doc = npl(str(links))
 # for i in links:
 #     if "title" in i.attrs:
 #         print(str(i.attrs["title"])+"\n")
-cont = 0
-for i in doc.ents:
-    if i.label_ == "PERSON":
-        print(str(i))
 
+
+def relate(person1, person2):
+    print(person1)
+    website = "https://en.wikipedia.org/wiki/" + person1
+    result = requests.get(website)
+    contenido = result.text
+    npl = spacy.load("en_core_web_sm")
+    soup = BeautifulSoup(contenido,"lxml")
+    links = soup.find_all("a")
+    doc = npl(str(links))
+    cont = 0
+    repertidos = []
+    for i in doc.ents:
+        if i.label_ == "PERSON":
+            if str(i) in repertidos:
+                continue
+            elif "Obama" in str(i) or "Barack" in str(i) or "title" in str(i) or "</a" in str(i) or "School" in str(i) or "Plan" in str(i) or ">" in str(i) or "=" in str(i) or "Stores" in str(i) or "States" in str(i):
+                continue
+            else:
+                cont += 1
+                print(str(cont)+". " + str(i)+ "--->" + i.label_)
+                repertidos.append(str(i))
+            if str(i) in person2 or person2 in str(i):
+                return True
+            if cont >= 10:
+                break
+
+
+print(relate("barack obama", "diomedez Diaz"))
